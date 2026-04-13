@@ -4054,23 +4054,28 @@
         },
         {
             "name": "matriphe/iso-639",
-            "version": "2.0",
+            "version": "v2.0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/matriphe/php-iso-639.git",
-                "reference": "3b7855e794ba31cdde1b464f66de3d39779b7a9e"
+                "reference": "aa2ddce7eb9000570e6398bf52f114ebf9f0691a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/matriphe/php-iso-639/zipball/3b7855e794ba31cdde1b464f66de3d39779b7a9e",
-                "reference": "3b7855e794ba31cdde1b464f66de3d39779b7a9e",
+                "url": "https://api.github.com/repos/matriphe/php-iso-639/zipball/aa2ddce7eb9000570e6398bf52f114ebf9f0691a",
+                "reference": "aa2ddce7eb9000570e6398bf52f114ebf9f0691a",
                 "shasum": ""
             },
             "require": {
                 "php": "8.*"
             },
             "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.75",
                 "phpunit/phpunit": ">=10"
+            },
+            "suggest": {
+                "ext-mbstring": "For better multibyte character support in text transformations",
+                "ext-xdebug": "For code coverage when running tests"
             },
             "type": "library",
             "autoload": {
@@ -4099,9 +4104,9 @@
             ],
             "support": {
                 "issues": "https://github.com/matriphe/php-iso-639/issues",
-                "source": "https://github.com/matriphe/php-iso-639/tree/2.0"
+                "source": "https://github.com/matriphe/php-iso-639/tree/v2.0.10"
             },
-            "time": "2024-03-17T22:44:23+00:00"
+            "time": "2025-10-05T21:40:44+00:00"
         },
         {
             "name": "maxmind-db/reader",
@@ -18298,6 +18303,6 @@
         "ext-fileinfo": "*",
         "ext-intl": "*"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.9.0"
 }
