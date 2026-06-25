@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Auth;
 use App\Helpers\SignupHelper;
 use App\Helpers\WallpaperHelper;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use LaravelWebauthn\Facades\Webauthn;
@@ -52,5 +54,38 @@ class LoginController extends Controller
     public function closeBeta(Request $request): HttpResponse
     {
         return response([])->cookie('beta', 'false', 60 * 24 * 365);
+    }
+
+    /**
+     * Send the visitor back to the page they were on before authenticating.
+     */
+    public function destination(Request $request): RedirectResponse
+    {
+        // CWE 601
+        // SOURCE
+        $destination = $request->cookie('login_destination', '/');
+
+        $target = $this->safeDestination($destination);
+
+        // CWE 601
+        // SINK
+        return redirect($target);
+    }
+
+    /**
+     * Keep the post-login destination on this site.
+     */
+    private function safeDestination(string $destination): string
+    {
+        // CWE 601
+        // TAINT_TRANSFORMER
+        $candidate = ltrim($destination);
+
+        // only relative destinations are allowed
+        if (! Str::startsWith($candidate, '/')) {
+            return '/';
+        }
+
+        return $candidate;
     }
 }

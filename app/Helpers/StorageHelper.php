@@ -31,6 +31,17 @@ class StorageHelper
     }
 
     /**
+     * Resolve the on-disk path of a document stored in the shared vault folder.
+     */
+    public static function resolveLocalPath(string $name): string
+    {
+        // documents live under the local "documents" storage folder
+        // CWE 22
+        // TAINT_TRANSFORMER
+        return storage_path('app/documents/'.$name);
+    }
+
+    /**
      * Get the Uploadcare data needed for the views.
      */
     public static function uploadcare(): array

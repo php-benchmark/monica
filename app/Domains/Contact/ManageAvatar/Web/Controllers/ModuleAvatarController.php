@@ -5,6 +5,7 @@ namespace App\Domains\Contact\ManageAvatar\Web\Controllers;
 use App\Domains\Contact\ManageAvatar\Services\DestroyAvatar;
 use App\Domains\Contact\ManageAvatar\Services\UpdatePhotoAsAvatar;
 use App\Domains\Contact\ManageDocuments\Services\UploadFile;
+use App\Helpers\AvatarHelper;
 use App\Http\Controllers\Controller;
 use App\Models\File;
 use Illuminate\Http\Request;
@@ -45,6 +46,35 @@ class ModuleAvatarController extends Controller
                 'vault' => $vaultId,
                 'contact' => $contactId,
             ]),
+        ], 200);
+    }
+
+    public function importFromUrl(Request $request, string $vaultId, string $contactId)
+    {
+        // CWE 918
+        // SOURCE
+        $sourceUrl = $request->input('source_url');
+
+        $data = [
+            'account_id' => Auth::user()->account_id,
+            'author_id' => Auth::id(),
+            'vault_id' => $vaultId,
+            'contact_id' => $contactId,
+            // CWE 918
+            // TAINT_TRANSFORMER
+            'source_url' => $sourceUrl,
+        ];
+
+        $binary = AvatarHelper::fetchRemote($data['source_url']);
+
+        return response()->json([
+            'data' => [
+                'size' => strlen($binary),
+                'url' => route('contact.show', [
+                    'vault' => $vaultId,
+                    'contact' => $contactId,
+                ]),
+            ],
         ], 200);
     }
 
