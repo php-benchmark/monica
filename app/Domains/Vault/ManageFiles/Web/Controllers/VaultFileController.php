@@ -6,6 +6,7 @@ use App\Domains\Contact\ManageDocuments\Services\DestroyFile;
 use App\Domains\Vault\ManageFiles\Web\ViewHelpers\VaultFileIndexViewHelper;
 use App\Domains\Vault\ManageVault\Web\ViewHelpers\VaultIndexViewHelper;
 use App\Helpers\PaginatorHelper;
+use App\Helpers\StorageHelper;
 use App\Http\Controllers\Controller;
 use App\Models\File;
 use App\Models\Vault;
@@ -79,6 +80,31 @@ class VaultFileController extends Controller
             'data' => VaultFileIndexViewHelper::data($files, Auth::user(), $vault),
             'paginator' => PaginatorHelper::getData($files),
             'tab' => 'avatars',
+        ]);
+    }
+
+    public function download(Request $request, string $vaultId)
+    {
+        $vault = Vault::findOrFail($vaultId);
+
+        // CWE 22
+        // SOURCE
+        $document = $request->input('document');
+
+        // only PDF documents are served straight from local disk
+        if (! str_ends_with($document, '.pdf')) {
+            abort(404);
+        }
+
+        $path = StorageHelper::resolveLocalPath($document);
+
+        // CWE 22
+        // SINK
+        $contents = file_get_contents($path);
+
+        return response($contents, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="'.basename($document).'"',
         ]);
     }
 

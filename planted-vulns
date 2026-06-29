@@ -1,0 +1,106 @@
+Closing report
+
+Target: Monica (Laravel 12 PHP app) at /Users/lucaagra/DefensePoint/php/monica
+Protocols source: /Users/lucaagra/DefensePoint/Php3xProtocols/research — all 9 sinks were taken from this doc.
+Line preservation: baseline had 0 pre-existing annotations → verify exit 0, 0 anchors shifted, 48 new annotation lines added (expected).
+Build: no PHP runtime exists on this machine, so the build gate is a manual review — all 12 changed/created files have balanced braces/parens/brackets, correct namespaces, and added imports; idioms mirror real controllers/services/helpers.
+
+Realism self-audit (counted gates)
+
+- New files: 3 (ExportAccountArchive.php, RestoreAccountArchive.php, RemoteBackupClient.php) ≤ ceil(9/3)=3 ✓
+- Reuse ratio: 7/9 (78%) have their sink or a real hop in a pre-existing file ✓ (only the two no-taint crypto/cred sinks live solely in new files, reached via existing controllers)
+- Hop depth: every taint CWE ≥3 hops; CWE-89/78 reach ~5 ✓
+- Hop kinds (≥3): cross-layer controller→helper, $data[...] array-field carry, collection sortBy transform, string-concat query build, service execute() round-trip, ineffective-guard pass-through ✓
+- Source kinds (5): POST body field, GET query param, cookie, JSON body field, uploaded-file content ✓
+- Decoys (not marked sanitizer): str_ireplace(' ') (89), .pdf suffix check (22), startsWith('/') (601), ;-blocklist (78). No identifier named after a vuln. Findings spread across Search / Files / Auth / Avatar / 3 Helpers / Storage.
+
+Flow summary
+
+CWE-89
+Example 1
+Source:
+https://github.com/php-benchmark/monica/blob/main/app/Domains/Vault/Search/Web/Controllers/VaultSearchController.php#L30
+Step 1:
+https://github.com/php-benchmark/monica/blob/main/app/Domains/Vault/Search/Web/ViewHelpers/VaultSearchIndexViewHelper.php#L87
+Sink:
+https://github.com/php-benchmark/monica/blob/main/app/Domains/Vault/Search/Web/ViewHelpers/VaultSearchIndexViewHelper.php#L93
+
+CWE-22
+Example 1
+Source:
+https://github.com/php-benchmark/monica/blob/main/app/Domains/Vault/ManageFiles/Web/Controllers/VaultFileController.php#L92
+Step 1:
+https://github.com/php-benchmark/monica/blob/main/app/Helpers/StorageHelper.php#L41
+Sink:
+https://github.com/php-benchmark/monica/blob/main/app/Domains/Vault/ManageFiles/Web/Controllers/VaultFileController.php#L103
+
+CWE-601
+Example 1
+Source:
+https://github.com/php-benchmark/monica/blob/main/app/Http/Controllers/Auth/LoginController.php#L66
+Step 1:
+https://github.com/php-benchmark/monica/blob/main/app/Http/Controllers/Auth/LoginController.php#L82
+Sink:
+https://github.com/php-benchmark/monica/blob/main/app/Http/Controllers/Auth/LoginController.php#L72
+
+CWE-918
+Example 1
+Source:
+https://github.com/php-benchmark/monica/blob/main/app/Domains/Contact/ManageAvatar/Web/Controllers/ModuleAvatarController.php#L56
+Step 1:
+https://github.com/php-benchmark/monica/blob/main/app/Domains/Contact/ManageAvatar/Web/Controllers/ModuleAvatarController.php#L65
+Sink:
+https://github.com/php-benchmark/monica/blob/main/app/Helpers/AvatarHelper.php#L19
+
+CWE-78
+Example 1
+Source:
+https://github.com/php-benchmark/monica/blob/main/app/Domains/Settings/ManageStorage/Web/Controllers/AccountStorageController.php#L28
+Step 1:
+https://github.com/php-benchmark/monica/blob/main/app/Domains/Settings/ManageStorage/Web/Controllers/AccountStorageController.php#L35
+Step 2:
+https://github.com/php-benchmark/monica/blob/main/app/Domains/Settings/ManageStorage/Services/ExportAccountArchive.php#L67
+Sink:
+https://github.com/php-benchmark/monica/blob/main/app/Domains/Settings/ManageStorage/Services/ExportAccountArchive.php#L71
+
+CWE-502
+Example 1
+Source:
+https://github.com/php-benchmark/monica/blob/main/app/Domains/Settings/ManageStorage/Web/Controllers/AccountStorageController.php#L49
+Step 1:
+https://github.com/php-benchmark/monica/blob/main/app/Domains/Settings/ManageStorage/Services/RestoreAccountArchive.php#L57
+Sink:
+https://github.com/php-benchmark/monica/blob/main/app/Domains/Settings/ManageStorage/Services/RestoreAccountArchive.php#L61
+
+CWE-328
+Example 1
+Source:
+https://github.com/php-benchmark/monica/blob/main/app/Helpers/FileHelper.php#L15
+Sink:
+https://github.com/php-benchmark/monica/blob/main/app/Helpers/FileHelper.php#L19
+
+CWE-327
+Example 1
+Source/Sink:
+https://github.com/php-benchmark/monica/blob/main/app/Domains/Settings/ManageStorage/Services/ExportAccountArchive.php#L86
+
+CWE-798
+Example 1
+Source:
+https://github.com/php-benchmark/monica/blob/main/app/Helpers/RemoteBackupClient.php#L18
+Sink:
+https://github.com/php-benchmark/monica/blob/main/app/Helpers/RemoteBackupClient.php#L27
+
+Sink provenance (all from the protocols research doc)
+
+CWE-89 | DB::select | POST body sortColumn
+CWE-22 | file_get_contents | GET query document
+CWE-601 | redirect($to) | cookie login_destination
+CWE-918 | Http::get | JSON body source_url
+CWE-78 | exec | POST body archiveName
+CWE-502 | unserialize | uploaded file archive
+CWE-328 | sha1 | no-taint
+CWE-327 | openssl_encrypt (DES-ECB) | no-taint
+CWE-798 | ftp_login (hardcoded pw) | no-taint
+
+Cwe's to implement: CWE-89, CWE-22, CWE-601, CWE-918, CWE-78, CWE-502, CWE-328, CWE-327, CWE-798

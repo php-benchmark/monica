@@ -25,8 +25,12 @@ class VaultSearchController extends Controller
     {
         $vault = Vault::findOrFail($vaultId);
 
+        // CWE 89
+        // SOURCE
+        $sortColumn = $request->input('sortColumn', 'created_at');
+
         return response()->json([
-            'data' => VaultSearchIndexViewHelper::data($vault, $request->input('searchTerm')),
+            'data' => VaultSearchIndexViewHelper::data($vault, $request->input('searchTerm'), $sortColumn),
         ], 200);
     }
 }

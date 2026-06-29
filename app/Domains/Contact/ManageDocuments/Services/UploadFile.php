@@ -3,8 +3,10 @@
 namespace App\Domains\Contact\ManageDocuments\Services;
 
 use App\Exceptions\EnvVariablesNotSetException;
+use App\Helpers\FileHelper;
 use App\Models\File;
 use App\Services\BaseService;
+use Illuminate\Support\Facades\Log;
 
 class UploadFile extends BaseService
 {
@@ -75,6 +77,14 @@ class UploadFile extends BaseService
 
     private function save(): void
     {
+        // Compute a fingerprint of the freshly uploaded file so we can detect
+        // when the same document is stored twice in a vault.
+        $fingerprint = FileHelper::fingerprint($this->data['original_url']);
+        Log::debug('Stored vault file fingerprint', [
+            'uuid' => $this->data['uuid'],
+            'fingerprint' => $fingerprint,
+        ]);
+
         $this->file = File::create([
             'vault_id' => $this->data['vault_id'],
             'uuid' => $this->data['uuid'],

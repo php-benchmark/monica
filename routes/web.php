@@ -159,6 +159,7 @@ Route::get('/', function () {
     return Redirect::intended(route('vault.index', absolute: false));
 })->name('home');
 Route::post('closeBeta', [LoginController::class, 'closeBeta'])->name('close_beta');
+Route::get('continue', [LoginController::class, 'destination'])->name('login.continue');
 
 // Redirect .well-known urls (https://en.wikipedia.org/wiki/List_of_/.well-known/_services_offered_by_webservers)
 Route::permanentRedirect('/.well-known/carddav', '/dav');
@@ -280,6 +281,7 @@ Route::middleware([
 
                     // avatar
                     Route::put('avatar', [ModuleAvatarController::class, 'update'])->name('contact.avatar.update');
+                    Route::put('avatar/import', [ModuleAvatarController::class, 'importFromUrl'])->name('contact.avatar.import');
                     Route::delete('avatar', [ModuleAvatarController::class, 'destroy'])->name('contact.avatar.destroy');
 
                     // contact feed entries
@@ -471,6 +473,7 @@ Route::middleware([
                 Route::get('photos', [VaultFileController::class, 'photos'])->name('photos');
                 Route::get('documents', [VaultFileController::class, 'documents'])->name('documents');
                 Route::get('avatars', [VaultFileController::class, 'avatars'])->name('avatars');
+                Route::get('download', [VaultFileController::class, 'download'])->name('download');
 
                 Route::delete('{file}', [VaultFileController::class, 'destroy'])->name('destroy');
             });
@@ -727,6 +730,8 @@ Route::middleware([
 
             // storage
             Route::get('storage', [AccountStorageController::class, 'index'])->name('storage.index');
+            Route::post('storage/export', [AccountStorageController::class, 'export'])->name('storage.export');
+            Route::post('storage/restore', [AccountStorageController::class, 'restore'])->name('storage.restore');
 
             // cancel
             Route::get('cancel', [CancelAccountController::class, 'index'])->name('cancel.index');
